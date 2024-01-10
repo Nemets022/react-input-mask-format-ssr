@@ -14,7 +14,15 @@ import { isFunction, toString, getElementDocument } from "./utils/helpers";
 import MaskUtils from "./utils/mask";
 import ChildrenWrapper from "./children-wrapper";
 
-const InputMask = forwardRef(function InputMask(props, forwardedRef) {
+const InputMask = forwardRef(function InputMask(
+  { isSsr = false, ...props },
+  forwardedRef
+) {
+  if (isSsr) {
+    if (typeof window === "undefined") {
+      return null;
+    }
+  }
   const {
     alwaysShowMask,
     children,
@@ -32,6 +40,7 @@ const InputMask = forwardRef(function InputMask(props, forwardedRef) {
   const isMasked = !!mask;
   const isEditable = !restProps.disabled && !restProps.readOnly;
   const isControlled = props.value !== null && props.value !== undefined;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const previousIsMasked = usePrevious(isMasked);
   const initialValue = toString(
     (isControlled ? props.value : props.defaultValue) || ""
@@ -42,7 +51,9 @@ const InputMask = forwardRef(function InputMask(props, forwardedRef) {
     getInputState,
     setInputState,
     getLastInputState
+    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useInputState(initialValue, isMasked);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const getInputElement = useInputElement(inputRef);
 
   function onChange(event) {
@@ -213,6 +224,7 @@ const InputMask = forwardRef(function InputMask(props, forwardedRef) {
   const lastSelection = lastState.selection;
   const lastValue = lastState.value;
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
     if (!isMasked) {
       return;
@@ -310,7 +322,8 @@ InputMask.propTypes = {
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   onChange: PropTypes.func,
-  onMouseDown: PropTypes.func
+  onMouseDown: PropTypes.func,
+  isSsr: PropTypes.bool
 };
 
 export default InputMask;
